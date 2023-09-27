@@ -64,13 +64,11 @@ def get_day_month_from_input(dayMonth=None):
                 if m.lower().startswith(day_month_lower):
                     month = m
                     break
+    # print("Day: " + str(day) + ", Month: " + str(month))
     return day, month
 
-def fetch_tickler_notes(dayMonth=None):
+def fetch_tickler_notes(day=None, month=None):
     print("Fetching tickler notes...")
-    day, month = get_day_month_from_input(dayMonth)
-    print("Day: " + str(day) + ", Month: " + str(month))
-    
     if day != None:
         day_folder = get_day_folder(day)
         
@@ -84,11 +82,26 @@ def fetch_tickler_notes(dayMonth=None):
         print(f"\nMoving notes from month folder ({os.path.basename(month_folder)})\n")
         move_files_to_inbox(month_folder)
 
+def get_tickler_status(day=None, month=None):
+    if day != None:
+        day_folder = get_day_folder(day)
+        dir_list = os.listdir(day_folder)
+        print(f"Day folder ({os.path.basename(day_folder)}) ({len(dir_list)} file{'' if len(dir_list) == 1 else 's'}): {dir_list}")
+    
+    if month != None:
+        month_folder = get_month_folder(month)
+        dir_list = os.listdir(month_folder)
+        print(f"Month folder ({os.path.basename(month_folder)}) ({len(dir_list)} file{'' if len(dir_list) == 1 else 's'}): {dir_list}")
+
 if __name__ == "__main__":
     args = sys.argv
-    dayMonth = None
     # first argument is script name
     # so we want second argument onwards
-    if len(args) > 1:
-        dayMonth = args[1]
-    fetch_tickler_notes(dayMonth)
+    if len(args) == 1:
+        fetch_tickler_notes()
+    elif len(args) == 2:
+        day, month = get_day_month_from_input(args[1])
+        fetch_tickler_notes(day, month)
+    elif len(args) == 3 and args[1] == 'status':
+        day, month = get_day_month_from_input(args[2])
+        get_tickler_status(day, month)
