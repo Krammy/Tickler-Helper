@@ -57,7 +57,8 @@ def get_day_month_from_input(dayMonth=None):
     elif isinstance(dayMonth, int):
         day = dayMonth
     elif isinstance(dayMonth, str):
-        if dayMonth.isdigit():
+        # include negative numbers
+        if dayMonth.lstrip('-').isdigit():
             day = int(dayMonth)
             if day == 1:
                 month = get_current_month()
@@ -86,8 +87,12 @@ def fetch_tickler_notes(day=None, month=None):
         move_files_to_inbox(month_folder)
 
 def get_tickler_status(day=None, month=None):
-    if day == None:
+    if day == None or day == 0:
         day = get_current_day()
+    elif day < 0:
+        # use relative day when negative number
+        current_day = get_current_day()
+        day = ((current_day + day - 1) % 31) + 1
     
     day_folder = get_day_folder(day)
     dir_list = os.listdir(day_folder)
