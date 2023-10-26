@@ -68,6 +68,15 @@ def get_day_month_from_input(dayMonth=None):
                 if m.lower().startswith(day_month_lower):
                     month = m
                     break
+    if day == 0:
+        day = get_current_day()
+    elif day < 0:
+        # use relative day when negative number
+        current_day = get_current_day()
+        day = ((current_day + day - 1) % 31) + 1
+    elif day > 31:
+        day = ((day - 1) % 31) + 1
+    
     # print("Day: " + str(day) + ", Month: " + str(month))
     return day, month
 
@@ -87,20 +96,11 @@ def fetch_tickler_notes(day=None, month=None):
         move_files_to_inbox(month_folder)
 
 def get_tickler_status(day=None, month=None):
-    if day == None or day == 0:
-        day = get_current_day()
-    elif day < 0:
-        # use relative day when negative number
-        current_day = get_current_day()
-        day = ((current_day + day - 1) % 31) + 1
-    
-    day_folder = get_day_folder(day)
-    dir_list = os.listdir(day_folder)
-    print(f"Day folder ({os.path.basename(day_folder)}) ({len(dir_list)} file{'' if len(dir_list) == 1 else 's'}): {dir_list}")
-    
-    if day == 1 and month == None:
-        month = get_current_month()
-    
+    if day != None:
+        day_folder = get_day_folder(day)
+        dir_list = os.listdir(day_folder)
+        print(f"Day folder ({os.path.basename(day_folder)}) ({len(dir_list)} file{'' if len(dir_list) == 1 else 's'}): {dir_list}")
+        
     if month != None:
         month_folder = get_month_folder(month)
         dir_list = os.listdir(month_folder)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         fetch_tickler_notes()
     elif len(args) == 2:
         if args[1] == 'status':
-            get_tickler_status()
+            get_tickler_status(*get_day_month_from_input())
         else:
             day, month = get_day_month_from_input(args[1])
             fetch_tickler_notes(day, month)
