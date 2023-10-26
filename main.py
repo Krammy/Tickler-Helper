@@ -43,12 +43,15 @@ def get_month_folder(month):
         if month in folder:
             return os.path.join(months_folder, folder)
 
+def get_current_day():
+    now = datetime.now()
+    return now.day
+
 def get_day_month_from_input(dayMonth=None):
     day = None
     month = None
     if dayMonth == None:
-        now = datetime.now()
-        day = now.day
+        day = get_current_day()
         if day == 1:
             month = get_current_month()
     elif isinstance(dayMonth, int):
@@ -83,10 +86,15 @@ def fetch_tickler_notes(day=None, month=None):
         move_files_to_inbox(month_folder)
 
 def get_tickler_status(day=None, month=None):
-    if day != None:
-        day_folder = get_day_folder(day)
-        dir_list = os.listdir(day_folder)
-        print(f"Day folder ({os.path.basename(day_folder)}) ({len(dir_list)} file{'' if len(dir_list) == 1 else 's'}): {dir_list}")
+    if day == None:
+        day = get_current_day()
+    
+    day_folder = get_day_folder(day)
+    dir_list = os.listdir(day_folder)
+    print(f"Day folder ({os.path.basename(day_folder)}) ({len(dir_list)} file{'' if len(dir_list) == 1 else 's'}): {dir_list}")
+    
+    if day == 1 and month == None:
+        month = get_current_month()
     
     if month != None:
         month_folder = get_month_folder(month)
@@ -98,11 +106,13 @@ if __name__ == "__main__":
     # first argument is script name
     # so we want second argument onwards
     if len(args) == 1:
-        day, month = get_day_month_from_input()
-        fetch_tickler_notes(day, month)
+        fetch_tickler_notes()
     elif len(args) == 2:
-        day, month = get_day_month_from_input(args[1])
-        fetch_tickler_notes(day, month)
+        if args[1] == 'status':
+            get_tickler_status()
+        else:
+            day, month = get_day_month_from_input(args[1])
+            fetch_tickler_notes(day, month)
     elif len(args) == 3 and args[1] == 'status':
         day, month = get_day_month_from_input(args[2])
         get_tickler_status(day, month)
