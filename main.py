@@ -111,7 +111,8 @@ if __name__ == "__main__":
     # first argument is script name
     # so we want second argument onwards
     if len(args) == 1:
-        fetch_tickler_notes()
+        day, month = get_day_month_from_input()
+        fetch_tickler_notes(day, month)
     elif len(args) == 2:
         if args[1] == 'status':
             get_tickler_status(*get_day_month_from_input())
